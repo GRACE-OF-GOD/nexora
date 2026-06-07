@@ -1,11 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Profile
+from .permissions import IsAdminOrEnseignant
 from .serializers import RegisterSerializer, UserSerializer
 
 
@@ -66,3 +68,9 @@ class ProfileView(APIView):
         profile.save()
 
         return Response(UserSerializer(user).data)
+
+
+class UserDetailView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrEnseignant]

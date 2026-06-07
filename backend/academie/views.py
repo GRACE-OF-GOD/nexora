@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, serializers
 
 from comptes.permissions import IsAdminOrEnseignant, IsAdminOrEnseignantOrReadOnly, IsOwnerOrAdminOrEnseignant
 from .models import Filiere, Matiere, Note
@@ -22,6 +22,12 @@ class FiliereDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Filiere.objects.all()
     serializer_class = FiliereSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdminOrEnseignantOrReadOnly]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.etudiant_set.exists():
+            raise serializers.ValidationError('Impossible de supprimer une filière qui contient des étudiants.')
+        return super().destroy(request, *args, **kwargs)
 
 
 class MatiereListCreateView(generics.ListCreateAPIView):

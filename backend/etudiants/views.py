@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
@@ -14,8 +15,27 @@ class EtudiantListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         profile = getattr(self.request.user, 'profile', None)
         if profile and profile.role in [profile.ROLE_ADMINISTRATION, profile.ROLE_ENSEIGNANT]:
-            return Etudiant.objects.all()
-        return Etudiant.objects.filter(user=self.request.user)
+            queryset = Etudiant.objects.all()
+        else:
+            queryset = Etudiant.objects.filter(user=self.request.user)
+
+        search = self.request.query_params.get('search')
+        filiere = self.request.query_params.get('filiere')
+        statut = self.request.query_params.get('statut')
+
+        if search:
+            queryset = queryset.filter(
+                Q(user__first_name__icontains=search)
+                | Q(user__last_name__icontains=search)
+                | Q(user__username__icontains=search)
+                | Q(matricule__icontains=search)
+            )
+        if filiere:
+            queryset = queryset.filter(filiere_id=filiere)
+        if statut:
+            queryset = queryset.filter(statut=statut)
+
+        return queryset
 
 
 class EtudiantDetailView(generics.RetrieveUpdateDestroyAPIView):

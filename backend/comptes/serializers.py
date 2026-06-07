@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'profile']
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -26,6 +26,7 @@ class RegisterSerializer(serializers.Serializer):
     last_name = serializers.CharField(required=False, allow_blank=True)
     role = serializers.ChoiceField(choices=Profile.ROLE_CHOICES)
     telephone = serializers.CharField(required=False, allow_blank=True)
+    is_active = serializers.BooleanField(default=True)
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
@@ -36,11 +37,13 @@ class RegisterSerializer(serializers.Serializer):
         password = validated_data.pop('password')
         role = validated_data.pop('role')
         telephone = validated_data.pop('telephone', '')
+        is_active = validated_data.pop('is_active', True)
         user = User(
             username=validated_data.get('username'),
             email=validated_data.get('email', ''),
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
+            is_active=is_active,
         )
         user.set_password(password)
         user.save()
