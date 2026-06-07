@@ -57,7 +57,8 @@ Puis connecte-toi sur : `http://127.0.0.1:8000/admin/`
 ### Étudiants
 
 - `GET /etudiants/` : lister les étudiants
-- `POST /etudiants/` : ajouter un étudiant
+- `POST /etudiants/` : ajouter un étudiant (requiert un `User` existant)
+- `POST /etudiants/create-with-user/` : créer un `User` + `Etudiant` en une seule requête
 - `GET /etudiants/<pk>/` : récupérer un étudiant
 - `PUT/PATCH /etudiants/<pk>/` : modifier un étudiant
 - `DELETE /etudiants/<pk>/` : supprimer un étudiant

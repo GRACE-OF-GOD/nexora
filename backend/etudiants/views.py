@@ -4,7 +4,7 @@ from rest_framework import generics, permissions
 
 from comptes.permissions import IsAdminOrEnseignant, IsOwnerOrAdminOrEnseignant
 from .models import Etudiant
-from .serializers import EtudiantSerializer
+from .serializers import EtudiantCreateSerializer, EtudiantSerializer
 
 
 class EtudiantListCreateView(generics.ListCreateAPIView):
@@ -22,6 +22,11 @@ class EtudiantDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Etudiant.objects.all()
     serializer_class = EtudiantSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdminOrEnseignant]
+
+
+class EtudiantCreateWithUserView(generics.CreateAPIView):
+    serializer_class = EtudiantCreateSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrEnseignant]
 
 
 class BulletinView(generics.GenericAPIView):
