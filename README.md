@@ -1,23 +1,17 @@
 # nexora
 
-Gestion scolaire avec un frontend Flutter et un backend Django REST API.
+A new Flutter project.
 
-## Structure du projet
+## Getting Started
 
-- `lib/` : application Flutter frontend
-- `backend/` : API Django qui gère les comptes, étudiants, absences, notes et bulletins
+This project is a starting point for a Flutter application.
 
-## Documentation backend
+A few resources to get you started if this is your first Flutter project:
 
-Le backend est documenté dans :
+- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
+- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
 
-- `backend/README.md`
-
-## État actuel
-
-- backend Django fonctionnel
-- JWT configuré pour l’authentification
-- endpoints CRUD pour étudiants, absences, filières, matières et notes
-- système de permissions par rôle en place
-
-> Pour démarrer le backend, consulte `backend/README.md`.
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
