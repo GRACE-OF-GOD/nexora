@@ -1,52 +1,44 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nexora/core/theme.dart';
-import 'package:nexora/core/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nexora/core/constants.dart';
+import 'package:nexora/core/theme.dart';
+import 'package:nexora/providers/theme_provider.dart';
+import 'package:nexora/core/router.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final prefs = await SharedPreferences.getInstance();
   final isDarkMode = prefs.getBool(AppConstants.themeKey) ?? false;
 
   runApp(
     ProviderScope(
-      child: NexoraApp(isDarkMode: isDarkMode),
+      overrides: [
+        themeProvider.overrideWith(
+          (ref) => ThemeNotifier(isDarkMode),
+        ),
+      ],
+      child: const NexoraApp(),
     ),
   );
 }
 
-class NexoraApp extends ConsumerStatefulWidget {
-  final bool isDarkMode;
-
-  const NexoraApp({super.key, required this.isDarkMode});
+class NexoraApp extends ConsumerWidget {
+  const NexoraApp({super.key});
 
   @override
-  ConsumerState<NexoraApp> createState() => _NexoraAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDarkMode = ref.watch(themeProvider);
 
-class _NexoraAppState extends ConsumerState<NexoraApp> {
-  late bool _isDarkMode;
-
-  @override
-  void initState() {
-    super.initState();
-    _isDarkMode = widget.isDarkMode;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const Scaffold(
-        body: Center(
-          child: Text('NEXORA'),
-        ),
-      ),
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      routerConfig: appRouter,
     );
   }
 }
