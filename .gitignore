@@ -2,7 +2,11 @@
 *.class
 *.log
 *.pyc
+*.sqlite3
+*.sqlite
 *.swp
+.venv/
+**/__pycache__/
 .DS_Store
 .atom/
 .build/
