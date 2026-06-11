@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nexora/core/theme.dart';
-import 'package:nexora/models/paiement_model.dart';
-import 'package:nexora/models/eleve_model.dart';
 
 class PaiementsScreen extends ConsumerStatefulWidget {
   const PaiementsScreen({super.key});
@@ -12,146 +10,163 @@ class PaiementsScreen extends ConsumerStatefulWidget {
 }
 
 class _PaiementsScreenState extends ConsumerState<PaiementsScreen> {
-  final _searchController = TextEditingController();
   String _searchQuery = '';
-  String _filtreType = 'Tous';
+  String _filtreStatut = 'Tous';
 
-  final List<PaiementModel> _paiements = [
-    PaiementModel(id: '1', montant: 50000, datePaiement: '2024-10-01', typeFrais: 'Inscription', idEleve: '1', nomEleve: 'Koffi', prenomEleve: 'Kossi', libelleClasse: '6eme A'),
-    PaiementModel(id: '2', montant: 25000, datePaiement: '2024-10-05', typeFrais: 'Scolarite', idEleve: '2', nomEleve: 'Ama', prenomEleve: 'Akosua', libelleClasse: '6eme A'),
-    PaiementModel(id: '3', montant: 50000, datePaiement: '2024-10-08', typeFrais: 'Inscription', idEleve: '3', nomEleve: 'Agbo', prenomEleve: 'Kofi', libelleClasse: '5eme B'),
-    PaiementModel(id: '4', montant: 25000, datePaiement: '2024-10-10', typeFrais: 'Scolarite', idEleve: '4', nomEleve: 'Mensah', prenomEleve: 'Afi', libelleClasse: '3eme A'),
-    PaiementModel(id: '5', montant: 10000, datePaiement: '2024-10-12', typeFrais: 'Transport', idEleve: '1', nomEleve: 'Koffi', prenomEleve: 'Kossi', libelleClasse: '6eme A'),
+  final List<Map<String, dynamic>> _paiements = [
+    {
+      'nom': 'Mensah Koffi',
+      'matricule': 'NEX-2024-001',
+      'montant': '75000',
+      'type': 'Scolarite',
+      'statut': 'Paye',
+      'date': '05/09/2024',
+    },
+    {
+      'nom': 'Agbeko Ama',
+      'matricule': 'NEX-2024-002',
+      'montant': '75000',
+      'type': 'Scolarite',
+      'statut': 'En_attente',
+      'date': '05/09/2024',
+    },
+    {
+      'nom': 'Kofi Kossi',
+      'matricule': 'NEX-2024-003',
+      'montant': '75000',
+      'type': 'Inscription',
+      'statut': 'Partiel',
+      'date': '01/09/2024',
+    },
   ];
 
-  final List<EleveModel> _eleves = [
-    EleveModel(id: '1', matricule: 'NEX001', nom: 'Koffi', prenom: 'Kossi', sexe: 'M', dateNaissance: '2005-03-15', telephone: '90000001', adresse: 'Lome', idClasse: '1', libelleClasse: '6eme A'),
-    EleveModel(id: '2', matricule: 'NEX002', nom: 'Ama', prenom: 'Akosua', sexe: 'F', dateNaissance: '2006-07-20', telephone: '90000002', adresse: 'Lome', idClasse: '1', libelleClasse: '6eme A'),
-    EleveModel(id: '3', matricule: 'NEX003', nom: 'Agbo', prenom: 'Kofi', sexe: 'M', dateNaissance: '2005-11-10', telephone: '90000003', adresse: 'Lome', idClasse: '2', libelleClasse: '5eme B'),
-    EleveModel(id: '4', matricule: 'NEX004', nom: 'Mensah', prenom: 'Afi', sexe: 'F', dateNaissance: '2006-01-05', telephone: '90000004', adresse: 'Lome', idClasse: '3', libelleClasse: '3eme A'),
-  ];
-
-  final List<String> _typesFrais = ['Tous', 'Inscription', 'Scolarite', 'Transport', 'Cantine', 'Autre'];
-
-  List<PaiementModel> get _filteredPaiements {
+  List<Map<String, dynamic>> get _paiementsFiltres {
     return _paiements.where((p) {
-      final matchSearch = _searchQuery.isEmpty ||
-          p.fullName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          p.libelleClasse.toLowerCase().contains(_searchQuery.toLowerCase());
-      final matchType = _filtreType == 'Tous' || p.typeFrais == _filtreType;
-      return matchSearch && matchType;
+      final matchSearch = p['nom']
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase()) ||
+          p['matricule'].toLowerCase().contains(_searchQuery.toLowerCase());
+      final matchStatut =
+          _filtreStatut == 'Tous' || p['statut'] == _filtreStatut;
+      return matchSearch && matchStatut;
     }).toList();
   }
 
-  double get _totalPaiements =>
-      _filteredPaiements.fold(0, (sum, p) => sum + p.montant);
-
-  Color _getTypeColor(String type) {
-    switch (type) {
-      case 'Inscription':
-        return AppColors.primary;
-      case 'Scolarite':
-        return const Color(0xFF388E3C);
-      case 'Transport':
-        return const Color(0xFF7B1FA2);
-      case 'Cantine':
+  Color _couleurStatut(String statut) {
+    switch (statut) {
+      case 'Paye':
+        return AppColors.success;
+      case 'En_attente':
+        return AppColors.error;
+      case 'Partiel':
         return const Color(0xFFF57C00);
       default:
-        return AppColors.secondary;
+        return AppColors.primary;
     }
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  String _libelleStatut(String statut) {
+    switch (statut) {
+      case 'Paye':
+        return 'Paye';
+      case 'En_attente':
+        return 'En attente';
+      case 'Partiel':
+        return 'Partiel';
+      default:
+        return statut;
+    }
   }
 
-  void _showAddPaiementDialog() {
-    showDialog(
+  void _afficherFormulaire({Map<String, dynamic>? paiement}) {
+    final nomController =
+        TextEditingController(text: paiement?['nom'] ?? '');
+    final montantController =
+        TextEditingController(text: paiement?['montant'] ?? '');
+    String typeFrais = paiement?['type'] ?? 'Scolarite';
+    String statut = paiement?['statut'] ?? 'En_attente';
+
+    showModalBottomSheet(
       context: context,
-      builder: (context) => _AddPaiementDialog(
-        eleves: _eleves,
-        typesFrais: _typesFrais.where((t) => t != 'Tous').toList(),
-        onSave: (paiement) {
-          setState(() => _paiements.add(paiement));
-        },
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-    );
-  }
-
-  void _showRecuDialog(PaiementModel paiement) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Recu de paiement'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                'NEXORA',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                paiement == null ? 'Nouveau paiement' : 'Modifier paiement',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: nomController,
+                decoration: const InputDecoration(
+                  labelText: 'Nom de l\'eleve',
+                  prefixIcon: Icon(Icons.person_outlined),
                 ),
               ),
-            ),
-            const Divider(),
-            const SizedBox(height: 8),
-            _buildRecuLigne('Eleve', paiement.fullName),
-            _buildRecuLigne('Classe', paiement.libelleClasse),
-            _buildRecuLigne('Type', paiement.typeFrais),
-            _buildRecuLigne('Date', paiement.datePaiement),
-            const Divider(),
-            _buildRecuLigne(
-              'Montant',
-              '${paiement.montant.toStringAsFixed(0)} FCFA',
-              isBold: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Recu de ${paiement.fullName} imprime'),
-                  backgroundColor: const Color(0xFF388E3C),
+              const SizedBox(height: 16),
+              TextField(
+                controller: montantController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Montant (FCFA)',
+                  prefixIcon: Icon(Icons.payments_outlined),
                 ),
-              );
-            },
-            icon: const Icon(Icons.print_outlined),
-            label: const Text('Imprimer'),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: typeFrais,
+                decoration: const InputDecoration(
+                  labelText: 'Type de frais',
+                  prefixIcon: Icon(Icons.category_outlined),
+                ),
+                items: ['Scolarite', 'Inscription', 'Cantine', 'Uniforme', 'Transport']
+                    .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                    .toList(),
+                onChanged: (val) => setModalState(() => typeFrais = val!),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: statut,
+                decoration: const InputDecoration(
+                  labelText: 'Statut',
+                  prefixIcon: Icon(Icons.info_outlined),
+                ),
+                items: ['Paye', 'En_attente', 'Partiel']
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .toList(),
+                onChanged: (val) => setModalState(() => statut = val!),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(paiement == null
+                          ? 'Paiement enregistre'
+                          : 'Paiement modifie'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                },
+                child: Text(paiement == null ? 'Enregistrer' : 'Modifier'),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecuLigne(String label, String valeur, {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          Text(
-            valeur,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              fontSize: isBold ? 18 : 14,
-              color: isBold ? AppColors.primary : null,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -162,101 +177,54 @@ class _PaiementsScreenState extends ConsumerState<PaiementsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion des Paiements'),
+        title: const Text('Paiements'),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddPaiementDialog,
+        onPressed: () => _afficherFormulaire(),
         backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Nouveau paiement', style: TextStyle(color: Colors.white)),
+        icon: const Icon(Icons.add, color: AppColors.white),
+        label: const Text(
+          'Nouveau paiement',
+          style: TextStyle(color: AppColors.white),
+        ),
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Card(
-              color: AppColors.primary,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Total encaisse',
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Paiements filtres',
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '${_totalPaiements.toStringAsFixed(0)} FCFA',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) => setState(() => _searchQuery = value),
-              decoration: const InputDecoration(
-                hintText: 'Rechercher un eleve...',
-                prefixIcon: Icon(Icons.search),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 40,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _typesFrais.length,
-              itemBuilder: (context, index) {
-                final type = _typesFrais[index];
-                final isSelected = _filtreType == type;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(type),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() => _filtreType = type);
-                    },
-                    selectedColor: AppColors.primary,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : null,
-                    ),
+            child: Column(
+              children: [
+                TextField(
+                  onChanged: (val) => setState(() => _searchQuery = val),
+                  decoration: const InputDecoration(
+                    hintText: 'Rechercher un eleve...',
+                    prefixIcon: Icon(Icons.search),
                   ),
-                );
-              },
+                ),
+                const SizedBox(height: 12),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: ['Tous', 'Paye', 'En_attente', 'Partiel']
+                        .map((statut) => Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: FilterChip(
+                                label: Text(_libelleStatut(statut)),
+                                selected: _filtreStatut == statut,
+                                selectedColor:
+                                    AppColors.primary.withValues(alpha: 0.2),
+                                onSelected: (_) => setState(
+                                    () => _filtreStatut = statut),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              '${_filteredPaiements.length} paiement(s) trouve(s)',
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
-          const SizedBox(height: 8),
           Expanded(
-            child: _filteredPaiements.isEmpty
+            child: _paiementsFiltres.isEmpty
                 ? Center(
                     child: Text(
                       'Aucun paiement trouve',
@@ -264,58 +232,71 @@ class _PaiementsScreenState extends ConsumerState<PaiementsScreen> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _filteredPaiements.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _paiementsFiltres.length,
                     itemBuilder: (context, index) {
-                      final paiement = _filteredPaiements[index];
-                      final color = _getTypeColor(paiement.typeFrais);
-
+                      final p = _paiementsFiltres[index];
                       return Card(
                         margin: const EdgeInsets.only(bottom: 12),
                         child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: color,
-                            child: const Icon(Icons.payments_outlined, color: Colors.white, size: 20),
+                          contentPadding: const EdgeInsets.all(16),
+                          leading: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.payments_outlined,
+                                color: AppColors.primary),
                           ),
-                          title: Text(paiement.fullName, style: theme.textTheme.titleLarge),
+                          title: Text(
+                            p['nom'],
+                            style: theme.textTheme.titleLarge!
+                                .copyWith(fontSize: 16),
+                          ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Classe : ${paiement.libelleClasse}'),
-                              Text('Date : ${paiement.datePaiement}'),
-                              Container(
-                                margin: const EdgeInsets.only(top: 4),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: color.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: color),
-                                ),
-                                child: Text(
-                                  paiement.typeFrais,
-                                  style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${p['matricule']} - ${p['type']}',
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${p['montant']} FCFA - ${p['date']}',
+                                style: theme.textTheme.bodyMedium!.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
                           trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                '${paiement.montant.toStringAsFixed(0)}',
-                                style: TextStyle(
-                                  color: color,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: _couleurStatut(p['statut'])
+                                      .withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  _libelleStatut(p['statut']),
+                                  style: TextStyle(
+                                    color: _couleurStatut(p['statut']),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                              const Text('FCFA', style: TextStyle(fontSize: 11)),
                               IconButton(
-                                icon: const Icon(Icons.receipt_outlined),
-                                onPressed: () => _showRecuDialog(paiement),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
+                                icon: const Icon(Icons.edit_outlined,
+                                    color: AppColors.primary, size: 20),
+                                onPressed: () =>
+                                    _afficherFormulaire(paiement: p),
                               ),
                             ],
                           ),
@@ -326,141 +307,6 @@ class _PaiementsScreenState extends ConsumerState<PaiementsScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _AddPaiementDialog extends StatefulWidget {
-  final List<EleveModel> eleves;
-  final List<String> typesFrais;
-  final Function(PaiementModel) onSave;
-
-  const _AddPaiementDialog({
-    required this.eleves,
-    required this.typesFrais,
-    required this.onSave,
-  });
-
-  @override
-  State<_AddPaiementDialog> createState() => _AddPaiementDialogState();
-}
-
-class _AddPaiementDialogState extends State<_AddPaiementDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _montantController = TextEditingController();
-  EleveModel? _selectedEleve;
-  String _typeFrais = 'Inscription';
-  String _datePaiement = DateTime.now().toString().substring(0, 10);
-
-  @override
-  void dispose() {
-    _montantController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Nouveau paiement'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<EleveModel>(
-                value: _selectedEleve,
-                decoration: const InputDecoration(labelText: 'Eleve'),
-                items: widget.eleves.map((e) {
-                  return DropdownMenuItem(
-                    value: e,
-                    child: Text('${e.fullName} - ${e.libelleClasse}'),
-                  );
-                }).toList(),
-                onChanged: (v) => setState(() => _selectedEleve = v),
-                validator: (v) => v == null ? 'Veuillez choisir un eleve' : null,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: _typeFrais,
-                decoration: const InputDecoration(labelText: 'Type de frais'),
-                items: widget.typesFrais.map((t) {
-                  return DropdownMenuItem(value: t, child: Text(t));
-                }).toList(),
-                onChanged: (v) => setState(() => _typeFrais = v!),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _montantController,
-                decoration: const InputDecoration(
-                  labelText: 'Montant (FCFA)',
-                  prefixIcon: Icon(Icons.payments_outlined),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (v) {
-                  if (v!.isEmpty) return 'Champ obligatoire';
-                  if (double.tryParse(v) == null) return 'Montant invalide';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              InkWell(
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2024),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _datePaiement = date.toString().substring(0, 10);
-                    });
-                  }
-                },
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Date de paiement',
-                    prefixIcon: Icon(Icons.calendar_today_outlined),
-                  ),
-                  child: Text(_datePaiement),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              final newPaiement = PaiementModel(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
-                montant: double.parse(_montantController.text),
-                datePaiement: _datePaiement,
-                typeFrais: _typeFrais,
-                idEleve: _selectedEleve!.id,
-                nomEleve: _selectedEleve!.nom,
-                prenomEleve: _selectedEleve!.prenom,
-                libelleClasse: _selectedEleve!.libelleClasse,
-              );
-              widget.onSave(newPaiement);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Paiement enregistre avec succes'),
-                  backgroundColor: Color(0xFF388E3C),
-                ),
-              );
-            }
-          },
-          child: const Text('Enregistrer'),
-        ),
-      ],
     );
   }
 }
