@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nexora/core/constants.dart';
 import 'package:nexora/providers/auth_provider.dart';
@@ -13,8 +13,16 @@ import 'package:nexora/screens/admin/absences_screen.dart';
 import 'package:nexora/screens/admin/bulletins_screen.dart';
 import 'package:nexora/screens/admin/paiements_screen.dart';
 import 'package:nexora/screens/teacher/teacher_dashboard_screen.dart';
+import 'package:nexora/screens/teacher/emploi_temps_teacher_screen.dart';
 import 'package:nexora/screens/parent/parent_dashboard_screen.dart';
+import 'package:nexora/screens/parent/notes_parent_screen.dart';
+import 'package:nexora/screens/parent/absences_parent_screen.dart';
+import 'package:nexora/screens/parent/bulletins_parent_screen.dart';
 import 'package:nexora/screens/student/student_dashboard_screen.dart';
+import 'package:nexora/screens/student/notes_student_screen.dart';
+import 'package:nexora/screens/student/absences_student_screen.dart';
+import 'package:nexora/screens/student/bulletins_student_screen.dart';
+import 'package:nexora/screens/student/emploi_temps_student_screen.dart';
 import 'package:nexora/screens/settings/settings_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -23,11 +31,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/login',
     redirect: (context, state) {
-      final isLoggedIn = authState.value != null;
-      final isLoginPage = state.matchedLocation == '/login';
+       final isLoggedIn = authState.value != null;
+final isLoginPage = state.matchedLocation == '/login';
 
-      if (!isLoggedIn && !isLoginPage) return '/login';
-      if (isLoggedIn && isLoginPage) {
+if (!isLoggedIn && !isLoginPage) return '/login';
+if (!isLoggedIn) return null;
+if (isLoginPage) {
         final role = authState.value!.role;
         if (role == AppConstants.roleAdmin) return '/admin';
         if (role == AppConstants.roleTeacher) return '/teacher';
@@ -93,9 +102,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const TeacherDashboardScreen(),
       ),
       GoRoute(
+        path: '/teacher/emploi-temps',
+        name: 'teacher-emploi-temps',
+        builder: (context, state) => const EmploiTempsTeacherScreen(),
+      ),
+      GoRoute(
         path: '/parent',
         name: 'parent-dashboard',
         builder: (context, state) => const ParentDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/parent/notes',
+        name: 'parent-notes',
+        builder: (context, state) => const NotesParentScreen(),
+      ),
+      GoRoute(
+        path: '/parent/absences',
+        name: 'parent-absences',
+        builder: (context, state) => const AbsencesParentScreen(),
+      ),
+      GoRoute(
+        path: '/parent/bulletins',
+        name: 'parent-bulletins',
+        builder: (context, state) => const BulletinsParentScreen(),
       ),
       GoRoute(
         path: '/student',
@@ -103,10 +132,31 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const StudentDashboardScreen(),
       ),
       GoRoute(
-      path: '/settings',
-      name: 'settings',
-       builder: (context, state) => const SettingsScreen(),
-),
+        path: '/student/notes',
+        name: 'student-notes',
+        builder: (context, state) => const NotesStudentScreen(),
+      ),
+      GoRoute(
+        path: '/student/absences',
+        name: 'student-absences',
+        builder: (context, state) => const AbsencesStudentScreen(),
+      ),
+      GoRoute(
+        path: '/student/bulletins',
+        name: 'student-bulletins',
+        builder: (context, state) => const BulletinsStudentScreen(),
+      ),
+      GoRoute(
+        path: '/student/emploi-temps',
+        name: 'student-emploi-temps',
+        builder: (context, state) => const EmploiTempsStudentScreen(),
+      ),
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      
     ],
   );
 });

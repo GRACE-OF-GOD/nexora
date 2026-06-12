@@ -22,6 +22,10 @@ class StudentDashboardScreen extends ConsumerWidget {
             onPressed: () {},
           ),
           IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await ref.read(authStateProvider.notifier).logout();
@@ -94,38 +98,42 @@ class StudentDashboardScreen extends ConsumerWidget {
         icon: Icons.grade_outlined,
         color: AppColors.primary,
         description: 'Consulter mes notes',
-        onTap: () {},
+        onTap: () => context.push('/student/notes'),
       ),
       _MenuItem(
         label: 'Mes absences',
         icon: Icons.event_busy_outlined,
         color: const Color(0xFFD32F2F),
         description: 'Voir mes absences',
-        onTap: () {},
+        onTap: () => context.push('/student/absences'),
       ),
       _MenuItem(
         label: 'Mes bulletins',
         icon: Icons.description_outlined,
         color: const Color(0xFF7B1FA2),
         description: 'Consulter mes bulletins',
-        onTap: () {},
+        onTap: () => context.push('/student/bulletins'),
       ),
       _MenuItem(
         label: 'Emploi du temps',
         icon: Icons.calendar_today_outlined,
         color: const Color(0xFF388E3C),
         description: 'Voir mon planning',
-        onTap: () {},
+        onTap: () => context.push('/student/emploi-temps'),
+      ),
+      _MenuItem(
+        label: 'Parametres',
+        icon: Icons.settings_outlined,
+        color: AppColors.secondary,
+        description: 'Gerer mon compte',
+        onTap: () => context.push('/settings'),
       ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Menu',
-          style: theme.textTheme.titleLarge,
-        ),
+        Text('Menu', style: theme.textTheme.titleLarge),
         const SizedBox(height: 16),
         GridView.builder(
           shrinkWrap: true,

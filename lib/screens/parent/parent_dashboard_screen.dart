@@ -18,8 +18,8 @@ class ParentDashboardScreen extends ConsumerWidget {
         title: const Text('NEXORA'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -57,7 +57,7 @@ class ParentDashboardScreen extends ConsumerWidget {
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: AppColors.white.withOpacity(0.2),
+            backgroundColor: AppColors.white.withValues(alpha: 0.2),
             child: const Icon(Icons.person, color: AppColors.white, size: 32),
           ),
           const SizedBox(width: 16),
@@ -76,7 +76,7 @@ class ParentDashboardScreen extends ConsumerWidget {
                 Text(
                   'Espace Parent',
                   style: theme.textTheme.bodyMedium!.copyWith(
-                    color: AppColors.white.withOpacity(0.8),
+                    color: AppColors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -89,51 +89,18 @@ class ParentDashboardScreen extends ConsumerWidget {
 
   Widget _buildMenuGrid(BuildContext context, ThemeData theme) {
     final items = [
-      _MenuItem(
-        label: 'Mon enfant',
-        icon: Icons.child_care,
-        color: AppColors.primary,
-        onTap: () {},
-      ),
-      _MenuItem(
-        label: 'Notes',
-        icon: Icons.grade_outlined,
-        color: const Color(0xFF388E3C),
-        onTap: () {},
-      ),
-      _MenuItem(
-        label: 'Absences',
-        icon: Icons.event_busy_outlined,
-        color: const Color(0xFFD32F2F),
-        onTap: () {},
-      ),
-      _MenuItem(
-        label: 'Bulletins',
-        icon: Icons.description_outlined,
-        color: const Color(0xFF7B1FA2),
-        onTap: () {},
-      ),
-      _MenuItem(
-        label: 'Paiements',
-        icon: Icons.payments_outlined,
-        color: const Color(0xFFF57C00),
-        onTap: () {},
-      ),
-      _MenuItem(
-        label: 'Notifications',
-        icon: Icons.notifications_outlined,
-        color: AppColors.secondary,
-        onTap: () {},
-      ),
+      _MenuItem(label: 'Mon enfant', icon: Icons.child_care, color: AppColors.primary, onTap: () {}),
+      _MenuItem(label: 'Notes', icon: Icons.grade_outlined, color: const Color(0xFF388E3C), onTap: () => context.push('/parent/notes')),
+      _MenuItem(label: 'Absences', icon: Icons.event_busy_outlined, color: const Color(0xFFD32F2F), onTap: () => context.push('/parent/absences')),
+      _MenuItem(label: 'Bulletins', icon: Icons.description_outlined, color: const Color(0xFF7B1FA2), onTap: () => context.push('/parent/bulletins')),
+      _MenuItem(label: 'Paiements', icon: Icons.payments_outlined, color: const Color(0xFFF57C00), onTap: () {}),
+      _MenuItem(label: 'Parametres', icon: Icons.settings_outlined, color: AppColors.secondary, onTap: () => context.push('/settings')),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Menu',
-          style: theme.textTheme.titleLarge,
-        ),
+        Text('Menu', style: theme.textTheme.titleLarge),
         const SizedBox(height: 16),
         GridView.builder(
           shrinkWrap: true,
@@ -167,7 +134,7 @@ class ParentDashboardScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: item.color.withOpacity(0.1),
+                  color: item.color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(item.icon, color: item.color, size: 28),
@@ -175,9 +142,7 @@ class ParentDashboardScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               Text(
                 item.label,
-                style: theme.textTheme.bodyMedium!.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: theme.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w600),
                 textAlign: TextAlign.center,
               ),
             ],

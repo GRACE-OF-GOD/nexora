@@ -1,22 +1,28 @@
- import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:nexora/core/constants.dart';
 import 'package:nexora/models/user_model.dart';
 
 class AuthService {
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: AppConstants.apiBaseUrl,
-      connectTimeout: Duration(milliseconds: AppConstants.connectTimeout),
-      receiveTimeout: Duration(milliseconds: AppConstants.receiveTimeout),
-    ),
-  );
+  final Dio _dio;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+  AuthService()
+      : _dio = Dio(
+          BaseOptions(
+            baseUrl: AppConstants.apiBaseUrl,
+            connectTimeout:
+                Duration(milliseconds: AppConstants.connectTimeout),
+            receiveTimeout:
+                Duration(milliseconds: AppConstants.receiveTimeout),
+            headers: {'Content-Type': 'application/json'},
+          ),
+        );
 
   Future<UserModel> login(String email, String password) async {
     try {
       final response = await _dio.post(
-        '/login',
+        '/api/login',
         data: {'email': email, 'password': password},
       );
       final token = response.data['token'];
@@ -28,13 +34,33 @@ class AuthService {
       if (e.response?.statusCode == 401) {
         throw Exception('Email ou mot de passe incorrect');
       }
+      if (e.response?.statusCode == 422) {
+        throw Exception('Donnees invalides');
+      }
+      if (e.type == DioExceptionType.connectionTimeout) {
+        throw Exception('Connexion trop lente. Verifiez votre internet');
+      }
+      if (e.type == DioExceptionType.connectionError) {
+        throw Exception('Impossible de contacter le serveur');
+      }
       throw Exception('Erreur de connexion. Veuillez reessayer');
     }
   }
 
   Future<void> logout() async {
-    await _storage.delete(key: AppConstants.tokenKey);
-    await _storage.delete(key: AppConstants.userRoleKey);
+    try {
+      final token = await _storage.read(key: AppConstants.tokenKey);
+      if (token != null) {
+        await _dio.post(
+          '/api/logout',
+          options: Options(headers: {'Authorization': 'Bearer $token'}),
+        );
+      }
+    } catch (_) {
+    } finally {
+      await _storage.delete(key: AppConstants.tokenKey);
+      await _storage.delete(key: AppConstants.userRoleKey);
+    }
   }
 
   Future<String?> getToken() async {
@@ -43,5 +69,10 @@ class AuthService {
 
   Future<String?> getUserRole() async {
     return await _storage.read(key: AppConstants.userRoleKey);
+  }
+
+  Future<bool> isLoggedIn() async {
+    final token = await _storage.read(key: AppConstants.tokenKey);
+    return token != null;
   }
 }
